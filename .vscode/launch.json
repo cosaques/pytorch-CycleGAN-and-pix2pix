@@ -1,0 +1,17 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Combine script",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/datasets/combine_A_and_B.py",
+      "args": [
+        "--fold_A", "/Users/artem/code/cosaques/biba-bop/utils/img/target/A",
+        "--fold_B", "/Users/artem/code/cosaques/biba-bop/utils/img/target/B",
+        "--fold_AB", "/Users/artem/code/cosaques/biba-bop/utils/img/target/AB",
+        "--no_multiprocessing"
+      ]
+    }
+  ]
+}
