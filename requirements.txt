@@ -3,3 +3,6 @@ torchvision>=0.5.0
 dominate>=2.4.0
 visdom>=0.1.8.8
 wandb
+opencv-python==4.10.0.84
+ultralytics==8.0.239
+ultralyticsplus==0.1.0
