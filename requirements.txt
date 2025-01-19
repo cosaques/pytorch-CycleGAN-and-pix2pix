@@ -6,3 +6,9 @@ wandb
 opencv-python==4.10.0.84
 ultralytics==8.0.239
 ultralyticsplus==0.1.0
+
+# API
+fastapi==0.108.0
+pytz
+uvicorn
+python-multipart

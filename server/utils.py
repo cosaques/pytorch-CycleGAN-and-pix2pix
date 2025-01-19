@@ -1,32 +1,32 @@
-import os
 import cv2
 import numpy as np
-from ultralyticsplus import YOLO
 from PIL import Image
 from torchvision import transforms
 
+from models import create_model
+from options.test_options import TestOptions
 from util import util
 
-model = YOLO('kesimeg/yolov8n-clothing-detection')
-target_label = 'clothing'
+def preprocess_image(model_yolo, image_bytes, output_path):
+    # Convert bytes to a NumPy array
+    nparr = np.frombuffer(image_bytes, np.uint8)
 
-def crop_scale(image_path, output_path):
     # Charger l'image
-    image = cv2.imread(image_path)
+    image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
     # Détecter des objets dans l'image
-    results = model(image)
+    results = model_yolo(image)
 
     # Extraire les résultats de détection (boîtes englobantes, classes, etc.)
     if len(results[0].boxes) == 0:
-        print(f"Object not detected for image")
-        return
+        print(f"Objects not detected for image")
+        return None
 
     detected = False
     for box in results[0].boxes:
         cls_id = int(box.cls[0])
         label = results[0].names[cls_id]
-        if label != target_label:
+        if label != 'clothing':
             continue
         detected = True
 
@@ -59,15 +59,27 @@ def crop_scale(image_path, output_path):
         cv2.imwrite(output_path, padded_image)
         print(f"Image sauvegardée sous {output_path}")
 
-        break
+        # Create a PIL Image from the RGB image
+        rgb_image = cv2.cvtColor(padded_image, cv2.COLOR_BGR2RGB)
+        pil_image = Image.fromarray(rgb_image)
+        return pil_image
 
     if not detected:
-        print(f"Label {target_label} not detected for image")
+        print(f"Clothes not detected for image")
+        return None
 
-def get_tensors(image_path):
-    # Load the image using PIL
-    image = Image.open(image_path).convert("RGB")  # Convert to RGB if not already
+def predict_professional_image(model_pic2pic, preprocessed_img, output_path):
+    image_tensors = _get_tensors(preprocessed_img)
 
+    # predict
+    model_pic2pic.real = image_tensors.to(model_pic2pic.device)
+    model_pic2pic.test()
+    visuals = model_pic2pic.get_current_visuals() # results
+
+    predicted_img = _get_image(visuals['fake'], output_path)
+    return predicted_img
+
+def _get_tensors(image):
     # Define transformations
     transform = transforms.Compose([
         transforms.Resize((256, 256)),  # Resize to 256x256 (example size)
@@ -81,13 +93,23 @@ def get_tensors(image_path):
     # Add batch dimension to create a 4D tensor
     return tensor_image.unsqueeze(0)  # Shape: [1, C, H, W]
 
-def save_tensors(tensor_image_4d, name):
-    im = util.tensor2im(tensor_image_4d)
+def _get_image(tensors, output_path):
+    im = util.tensor2im(tensors)
 
     # Define the path to save the image
-    results_folder = "./results"
-    if not os.path.exists(results_folder):
-        os.makedirs(results_folder)
-    save_path = os.path.join(results_folder, f"{name}.jpg")
+    util.save_image(im, output_path, aspect_ratio=1.0)
 
-    util.save_image(im, save_path, aspect_ratio=1.0)
+    return Image.fromarray(im)
+
+def load_model(opt):
+    # hard-code some parameters for test
+    opt.num_threads = 0   # test code only supports num_threads = 0
+    opt.batch_size = 1    # test code only supports batch_size = 1
+    opt.serial_batches = True  # disable data shuffling; comment this line if results on randomly chosen images are needed.
+    opt.no_flip = True    # no flip; comment this line if results on flipped images are needed.
+    opt.display_id = -1   # no visdom display; the test code saves the results to a HTML file.
+
+    # init model
+    model = create_model(opt)
+    model.setup(opt)
+    return model
