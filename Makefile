@@ -20,7 +20,7 @@ docker_deploy_cloud:
 		--timeout=300 \
 		--memory $(GAR_MEMORY) \
 		--region $(GCP_REGION) \
-		--env-vars-file .env.yaml
+		--service-account $(SERVICE_ACCOUNT) \
 
 streamlit:
 	-@streamlit run frontend/streamlit_app.py
