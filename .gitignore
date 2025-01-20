@@ -46,3 +46,5 @@ test/data/legacy_serialized.pt
 wandb/
 
 *.pt
+.env
+*.egg-info
