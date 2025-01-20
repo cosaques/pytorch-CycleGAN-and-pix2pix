@@ -46,8 +46,7 @@ async def process_tshirt(image: UploadFile = File(...)):
         # Call the preprocessing function
         preprocessed_img = preprocess_image(
             app.state.model_yolo,
-            img_bytes,
-            "./datasets/t-shirts/1736765461_scaled.jpeg"
+            img_bytes
         )
         if not preprocessed_img:
             raise HTTPException(status_code=500, detail="No t-shirt found on photo")
@@ -55,8 +54,7 @@ async def process_tshirt(image: UploadFile = File(...)):
         # Call the prediction function
         predicted_img = predict_professional_image(
             app.state.model_pic2pic,
-            preprocessed_img,
-            "./results/fake.jpg"
+            preprocessed_img
         )
 
         result_img = merge_images(preprocessed_img, predicted_img)

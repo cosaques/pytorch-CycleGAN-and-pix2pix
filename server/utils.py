@@ -4,10 +4,9 @@ from PIL import Image
 from torchvision import transforms
 
 from models import create_model
-from options.test_options import TestOptions
 from util import util
 
-def preprocess_image(model_yolo, image_bytes, output_path):
+def preprocess_image(model_yolo, image_bytes):
     # Convert bytes to a NumPy array
     nparr = np.frombuffer(image_bytes, np.uint8)
 
@@ -55,10 +54,6 @@ def preprocess_image(model_yolo, image_bytes, output_path):
         # Copier l'image redimensionnée dans l'image de fond
         padded_image[y_offset:y_offset + new_h, x_offset:x_offset + new_w] = resized_image
 
-        # Sauvegarder l'image
-        cv2.imwrite(output_path, padded_image)
-        print(f"Image sauvegardée sous {output_path}")
-
         # Create a PIL Image from the RGB image
         rgb_image = cv2.cvtColor(padded_image, cv2.COLOR_BGR2RGB)
         pil_image = Image.fromarray(rgb_image)
@@ -68,7 +63,7 @@ def preprocess_image(model_yolo, image_bytes, output_path):
         print(f"Clothes not detected for image")
         return None
 
-def predict_professional_image(model_pic2pic, preprocessed_img, output_path):
+def predict_professional_image(model_pic2pic, preprocessed_img):
     image_tensors = _get_tensors(preprocessed_img)
 
     # predict
@@ -76,7 +71,7 @@ def predict_professional_image(model_pic2pic, preprocessed_img, output_path):
     model_pic2pic.test()
     visuals = model_pic2pic.get_current_visuals() # results
 
-    predicted_img = _get_image(visuals['fake'], output_path)
+    predicted_img = _get_image(visuals['fake'])
     return predicted_img
 
 def _get_tensors(image):
@@ -93,12 +88,8 @@ def _get_tensors(image):
     # Add batch dimension to create a 4D tensor
     return tensor_image.unsqueeze(0)  # Shape: [1, C, H, W]
 
-def _get_image(tensors, output_path):
+def _get_image(tensors):
     im = util.tensor2im(tensors)
-
-    # Define the path to save the image
-    util.save_image(im, output_path, aspect_ratio=1.0)
-
     return Image.fromarray(im)
 
 def load_model(opt):
