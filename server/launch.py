@@ -1,3 +1,5 @@
+import argparse
+import sys
 import uvicorn
 from options.test_options import TestOptions
 from server.utils import merge_images, predict_professional_image, preprocess_image, load_model
@@ -73,5 +75,25 @@ async def process_tshirt(image: UploadFile = File(...)):
 def root():
     return {"health_check": "OK"}
 
+def get_host_port():
+    host = "127.0.0.1"  # Default values
+    port = 8000
+
+    if "--host" in sys.argv:
+        host_index = sys.argv.index("--host") + 1
+        if host_index < len(sys.argv):
+            host = sys.argv[host_index]
+
+    if "--port" in sys.argv:
+        port_index = sys.argv.index("--port") + 1
+        if port_index < len(sys.argv):
+            port = int(sys.argv[port_index])
+
+    # Remove processed args to avoid conflicts with TestOptions parser
+    sys.argv = [arg for arg in sys.argv if arg not in ["--host", host, "--port", str(port)]]
+
+    return host, port
+
 if __name__ == '__main__':
-    uvicorn.run("server.launch:app", host="127.0.0.1", port=8000, reload=True)
+    host, port = get_host_port()
+    uvicorn.run("server.launch:app", host=host, port=port)

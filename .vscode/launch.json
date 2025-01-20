@@ -26,6 +26,7 @@
         "--dataset_mode", "single",
         "--norm", "batch",
         "--gpu_ids", "-1",
+        "--port", "8001",
       ]
     }
   ]
