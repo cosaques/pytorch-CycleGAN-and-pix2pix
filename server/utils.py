@@ -113,3 +113,10 @@ def load_model(opt):
     model = create_model(opt)
     model.setup(opt)
     return model
+
+def merge_images(img1, img2):
+    # Create a new blank image with double the width
+    combined_img = Image.new('RGB', (512, 256))
+    combined_img.paste(img1, (0, 0))
+    combined_img.paste(img2, (256, 0))
+    return combined_img

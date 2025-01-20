@@ -1,6 +1,6 @@
 import uvicorn
 from options.test_options import TestOptions
-from server.utils import predict_professional_image, preprocess_image, load_model
+from server.utils import merge_images, predict_professional_image, preprocess_image, load_model
 from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,13 +33,6 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
-# Initialize the app state when the app starts
-@app.on_event("startup")
-async def startup_event():
-    opt = TestOptions().parse()
-    app.state.model_pic2pic = load_model(opt)
-    app.state.model_yolo = YOLO('kesimeg/yolov8n-clothing-detection')
-
 @app.post("/process_tshirt/")
 async def process_tshirt(image: UploadFile = File(...)):
     # Check if the uploaded file is an image
@@ -66,21 +59,14 @@ async def process_tshirt(image: UploadFile = File(...)):
             "./results/fake.jpg"
         )
 
+        result_img = merge_images(preprocessed_img, predicted_img)
+
         # Convert the preprocessed image to a byte stream
-        preprocessed_io = io.BytesIO()
-        preprocessed_img.save(preprocessed_io, format="JPEG")
-        preprocessed_io.seek(0)
+        result_io = io.BytesIO()
+        result_img.save(result_io, format="JPEG")
+        result_io.seek(0)
 
-        # Convert the predicted image to a byte stream
-        predicted_io = io.BytesIO()
-        predicted_img.save(predicted_io, format="JPEG")
-        predicted_io.seek(0)
-
-        # Return the images as separate responses
-        return {
-            "preprocessed": StreamingResponse(preprocessed_io, media_type="image/jpeg"),
-            "predicted": StreamingResponse(predicted_io, media_type="image/jpeg"),
-        }
+        return StreamingResponse(result_io, media_type="image/jpeg")
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
