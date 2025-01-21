@@ -4,7 +4,6 @@ from streamlit_javascript import st_javascript
 import requests
 from PIL import Image
 import io
-import base64
 import os
 
 dir_path = os.path.dirname(__file__)
@@ -13,7 +12,7 @@ dir_path = os.path.dirname(__file__)
 def is_local():
     url = st_javascript("window.location.href")  # Get the current URL
     if url and ("localhost" in url or "127.0.0.1" in url):
-        return True
+        return False
     return False
 
 # Set endpoint based on environment
