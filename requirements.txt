@@ -13,4 +13,3 @@ pytz
 uvicorn
 python-multipart
 streamlit
-streamlit-javascript

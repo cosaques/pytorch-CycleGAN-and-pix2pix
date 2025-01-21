@@ -1,6 +1,4 @@
-
 import streamlit as st
-from streamlit_javascript import st_javascript
 import requests
 from PIL import Image
 import io
@@ -8,15 +6,8 @@ import os
 
 dir_path = os.path.dirname(__file__)
 
-# Function to determine if running locally
-def is_local():
-    url = st_javascript("window.location.href")  # Get the current URL
-    if url and ("localhost" in url or "127.0.0.1" in url):
-        return False
-    return False
-
 # Set endpoint based on environment
-API_URL = "http://127.0.0.1:8000/process_tshirt/" if is_local() else "https://pix2pix-193679124808.europe-west1.run.app/process_tshirt/"
+API_URL = "https://pix2pix-193679124808.europe-west1.run.app/process_tshirt/"
 
 # Page title and description
 st.title("T-shirt Image Transformation")
