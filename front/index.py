@@ -30,7 +30,7 @@ with col3:
     st.markdown("<p style='text-align: center; font-size: 20px; font-weight: bold;'>Real professional photo</p>", unsafe_allow_html=True)
 
 # Display process image
-process_image_path = os.path.join(dir_path, "img", "t-shirts-3.png")
+process_image_path = os.path.join(dir_path, "src", "t-shirts-3.jpeg")
 st.image(process_image_path, caption="Transformation Process", use_container_width=True)
 
 # Upload image section
