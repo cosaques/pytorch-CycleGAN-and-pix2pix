@@ -12,3 +12,5 @@ fastapi==0.108.0
 pytz
 uvicorn
 python-multipart
+streamlit
+streamlit-javascript

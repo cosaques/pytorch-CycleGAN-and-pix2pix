@@ -1,5 +1,5 @@
 run_api:
-	python ./server/launch.py --dataroot "" --name "t-shirt-model-17-01-06-22" --model "test" --netG "unet_256" --dataset_mode "single" --norm "batch" --gpu_ids "-1"
+	python -m server.launch --dataroot "" --name "t-shirt-model-17-01-06-22" --model "test" --netG "unet_256" --dataset_mode "single" --norm "batch" --gpu_ids "-1"
 
 docker_build_local:
 	@docker build --tag $(GAR_IMAGE):dev .
@@ -23,7 +23,7 @@ docker_deploy_cloud:
 		--service-account $(SERVICE_ACCOUNT) \
 
 streamlit:
-	-@streamlit run frontend/streamlit_app.py
+	-@streamlit run front/index.py
 
 ################### DATA SOURCES ACTIONS ################
 

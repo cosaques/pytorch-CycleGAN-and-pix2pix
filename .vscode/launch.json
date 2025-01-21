@@ -28,6 +28,16 @@
         "--gpu_ids", "-1",
         "--port", "8001",
       ]
+    },
+    {
+      "name": "Streamlit",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "streamlit",
+      "args": [
+        "run",
+        "front/index.py"
+      ]
     }
   ]
 }
